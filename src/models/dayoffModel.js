@@ -1,0 +1,18 @@
+const db = require('../config/database');
+
+const DayOff = {
+  getAll: async () => {
+    const [rows] = await db.query('SELECT * FROM dayoffs');
+    return rows;
+  },
+
+  create: async ({ employee_id, day, reason }) => {
+    const [result] = await db.query(
+      'INSERT INTO dayoffs (employee_id, day, reason) VALUES (?, ?, ?)',
+      [employee_id, day, reason]
+    );
+    return { id: result.insertId, employee_id, day, reason };
+  }
+};
+
+module.exports = DayOff;

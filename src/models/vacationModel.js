@@ -1,9 +1,12 @@
 const db = require('../config/database');
+const { convertToCamelCase } = require('../utils/convertToCamelCase');
+
+
 
 const Vacation = {
   getAll: async () => {
     const [rows] = await db.query('SELECT * FROM vacations');
-    return rows;
+    return convertToCamelCase(rows);
   },
 
   getByEmployee: async (employee_id) => {

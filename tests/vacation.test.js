@@ -5,12 +5,26 @@ const db = require('../src/config/database');
 let employeeId;
 
 beforeAll(async () => {
-  const [rows] = await db.query('INSERT INTO employees (name, birth_date) VALUES (?, ?)', ['Fulano', '1995-05-20']);
-  employeeId = rows.insertId || 1;
+  // Limpar tabelas para evitar conflitos de FK
+  await db.query('DELETE FROM vacations');
+  // await db.query('DELETE FROM employees');
+
+  // Criar funcionário de teste
+  const [result] = await db.query(
+    'INSERT INTO employees (name, birth_date) VALUES (?, ?)',
+    ['Fulano', '1995-05-20']
+  );
+  employeeId = result.insertId;
 });
 
 afterAll(async () => {
+  // Limpar dados criados e encerrar conexão
+  // await db.query('DELETE FROM vacations');
+  // await db.query('DELETE FROM employees');
   await db.end();
+
+  // Pequeno delay para evitar open handles
+  await new Promise((resolve) => setTimeout(resolve, 100));
 });
 
 describe('Vacation API', () => {

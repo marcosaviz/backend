@@ -2,9 +2,9 @@ const mysql = require('mysql2/promise');
 
 async function setupDatabase() {
     const connection = await mysql.createConnection({
-        host: 'localhost',
-        user: 'root',
-        password: 'root'
+        host: '172.22.112.1',
+        user: 'marcos',
+        password: 'marcos20'
     });
 
     try {
@@ -76,3 +76,39 @@ async function setupDatabase() {
 }
 
 setupDatabase();
+
+
+
+/* 
+Adicionar ON DELETE CASCADE nas Foreign Keys
+Uma solução possível é garantir que, quando um registro em employees for excluído, os registros nas tabelas dependentes (vacations, dayoffs, shifts) sejam automaticamente removidos também. 
+Você pode modificar a definição das chaves estrangeiras nas tabelas relacionadas para incluir a cláusula ON DELETE CASCADE, 
+que irá excluir os registros dependentes automaticamente quando o funcionário for deletado.
+
+Aqui está o código para modificar as tabelas para usar o ON DELETE CASCADE:
+
+CREATE TABLE IF NOT EXISTS vacations (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    employee_id INT,
+    start_date DATE,
+    end_date DATE,
+    FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS dayoffs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    employee_id INT,
+    day DATE,
+    reason VARCHAR(255),
+    FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS shifts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    employee_id INT,
+    shift_date DATE,
+    shift_type ENUM('NIGHT', 'DAY'),
+    FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE
+);
+
+*/

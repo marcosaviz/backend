@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js", 
+    "start": "node index.js",
     "test": "jest",
     "test:watch": "jest --watch"
   },
@@ -21,7 +21,8 @@
     "mysql2": "^3.14.0",
     "passport": "^0.7.0",
     "passport-azure-ad": "^4.3.5",
-    "sequelize": "^6.37.7"
+    "sequelize": "^6.37.7",
+    "sequelize-to-json": "^0.10.4"
   },
   "devDependencies": {
     "@nestjs/testing": "^11.0.20",

@@ -32,7 +32,7 @@ describe('Shift Scheduler API', () => {
       .post('/api/shifts/generate')
       .send({ start_date: '2025-06-01', end_date: '2025-06-07' });
 
-    // console.log('Resposta:', response.body); // Descomente só se precisar debugar
+    console.log('Resposta:', response.body); // Descomente só se precisar debugar
 
     expect(response.statusCode).toBe(201);
     expect(response.body).toHaveProperty('generated');

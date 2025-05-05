@@ -3,10 +3,11 @@ const app = require('../src/app');
 const db = require('../src/config/database');
 
 
+
 let employeeId;
 
 beforeAll(async () => {
-  // Apagar as tabelas que têm FK para employees
+  //Apagar as tabelas que têm FK para employees
   // await db.query('DELETE FROM vacations');
   // await db.query('DELETE FROM dayoffs');
   // await db.query('DELETE FROM shifts');

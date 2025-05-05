@@ -2,9 +2,9 @@ const mysql = require('mysql2/promise');
 
 async function setupDatabase() {
     const connection = await mysql.createConnection({
-        host: '172.22.112.1',
-        user: 'marcos',
-        password: 'marcos20'
+        host: 'localhost',
+        user: 'maviz',
+        password: 'J@P0nes1995'
     });
 
     try {
@@ -15,6 +15,7 @@ async function setupDatabase() {
 
         await connection.query(`USE escala12x36;`);
 
+        // Criação da tabela employees
         await connection.query(`
             CREATE TABLE IF NOT EXISTS employees (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -25,39 +26,44 @@ async function setupDatabase() {
         `);
         console.log('Tabela employees criada/verificada.');
 
+        // Drop + recriação das tabelas relacionadas com ON DELETE CASCADE
+        await connection.query(`DROP TABLE IF EXISTS vacations;`);
         await connection.query(`
-            CREATE TABLE IF NOT EXISTS vacations (
+            CREATE TABLE vacations (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 employee_id INT,
                 start_date DATE,
                 end_date DATE,
-                FOREIGN KEY (employee_id) REFERENCES employees(id)
+                FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE
             );
         `);
-        console.log('Tabela vacations criada/verificada.');
+        console.log('Tabela vacations criada com ON DELETE CASCADE.');
 
+        await connection.query(`DROP TABLE IF EXISTS dayoffs;`);
         await connection.query(`
-            CREATE TABLE IF NOT EXISTS dayoffs (
+            CREATE TABLE dayoffs (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 employee_id INT,
                 day DATE,
                 reason VARCHAR(255),
-                FOREIGN KEY (employee_id) REFERENCES employees(id)
+                FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE
             );
         `);
-        console.log('Tabela dayoffs criada/verificada.');
+        console.log('Tabela dayoffs criada com ON DELETE CASCADE.');
 
+        await connection.query(`DROP TABLE IF EXISTS shifts;`);
         await connection.query(`
-            CREATE TABLE IF NOT EXISTS shifts (
+            CREATE TABLE shifts (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 employee_id INT,
                 shift_date DATE,
                 shift_type ENUM('NIGHT', 'DAY'),
-                FOREIGN KEY (employee_id) REFERENCES employees(id)
+                FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE
             );
         `);
-        console.log('Tabela shifts criada/verificada.');
+        console.log('Tabela shifts criada com ON DELETE CASCADE.');
 
+        // Tabela holidays (sem relação com employees)
         await connection.query(`
             CREATE TABLE IF NOT EXISTS holidays (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -76,8 +82,6 @@ async function setupDatabase() {
 }
 
 setupDatabase();
-
-
 
 /* 
 Adicionar ON DELETE CASCADE nas Foreign Keys

@@ -6,7 +6,7 @@ let employeeId;
 
 beforeAll(async () => {
   // Limpar tabelas para evitar conflitos de FK
-  await db.query('DELETE FROM vacations');
+  // await db.query('DELETE FROM vacations');
   // await db.query('DELETE FROM employees');
 
   // Criar funcionário de teste
@@ -18,7 +18,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  // Limpar dados criados e encerrar conexão
+  //Limpar dados criados e encerrar conexão
   // await db.query('DELETE FROM vacations');
   // await db.query('DELETE FROM employees');
   await db.end();

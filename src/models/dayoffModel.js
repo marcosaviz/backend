@@ -2,6 +2,8 @@ const db = require('../config/database');
 const { convertToCamelCase } = require('../utils/convertToCamelCase');
 
 
+
+
 const DayOff = {
   getAll: async () => {
     const [rows] = await db.query('SELECT * FROM dayoffs');

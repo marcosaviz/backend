@@ -11,7 +11,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  // Limpeza extra opcional, se necessário
+  //Limpeza extra opcional, se necessário
   // await db.query('DELETE FROM employees');
   await db.end();
 

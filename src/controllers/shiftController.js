@@ -10,6 +10,19 @@ exports.generate = async (req, res) => {
 };
 
 exports.list = async (req, res) => {
-  const [rows] = await db.query('SELECT * FROM shifts ORDER BY shift_date');
-  res.json(rows);
+  try {
+    const [rows] = await db.query(`
+      SELECT s.*, e.name AS employeeName
+      FROM shifts s
+      JOIN employees e ON e.id = s.employee_id
+      ORDER BY s.shift_date
+      `);
+
+
+      res.json(rows);
+  }   catch (error) {
+    console.error( 'Erro ao buscar escalas:' ,error);
+    res.status(500).json({ message: 'Erro ao buscar escalas.'});
+  }
+  
 };

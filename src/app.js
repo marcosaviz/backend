@@ -6,9 +6,9 @@ const cors = require('cors'); // Importe o CORS
 
 // Configurando o CORS para permitir requisições do frontend
 app.use(cors({
-  origin: 'http://localhost:4200', // Permite requisições do frontend
+  origin: ['http://localhost:4200', 'http://127.0.0.1:4200'], // Permite requisições do frontend
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
 

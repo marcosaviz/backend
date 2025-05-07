@@ -10,14 +10,18 @@ const Employee = {
   },
 
   // Criar um novo funcionário
-  create: async ({ name, birth_date }) => {
+  create: async ({ name, birth_date, email, phone }) => {
+    // Extrai apenas a parte da data no formato YYYY-MM-DD
+    const formattedDate = new Date(birth_date).toISOString().split('T')[0];
     const snakeCaseData = {
-      name: name,
-      birth_date: birth_date
+      name,
+      birth_date: formattedDate, // ✅ Corrigido para usar a data formatada
+      email,
+      phone
     };
     const [result] = await db.query(
-      'INSERT INTO employees (name, birth_date) VALUES (?, ?)',
-      [snakeCaseData.name, snakeCaseData.birth_date]
+      'INSERT INTO employees (name, birth_date, email, phone) VALUES (?, ?, ?, ?)',
+      [name, formattedDate, email, phone]
     );
     return { id: result.insertId, ...snakeCaseData }; // Retornar os dados em camelCase
   },
@@ -37,15 +41,18 @@ const Employee = {
 
 
     // Atualiza um funcionário
-    update: async (id, { name, birth_date}) => {
+    update: async (id, { name, birth_date, email, phone}) => {
+      const formattedDate = new Date(birth_date).toISOString().split('T')[0];
       const snakeCaseData = {
         name,
-        birth_date
+        birth_date: formattedDate,
+        email,
+        phone
       };
 
       const [result] = await db.query(
-        'UPDATE employees SET name = ?, birth_date = ? WHERE id = ?',
-        [snakeCaseData.name, snakeCaseData.birth_date, id]
+        'UPDATE employees SET name = ?, birth_date = ?, email = ?, phone = ? WHERE id = ?',
+        [name, formattedDate, email, phone, id]
       );
       return { id, ...snakeCaseData}; // Retorna os dados em cemelCase
     }

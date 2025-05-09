@@ -1,6 +1,11 @@
-const { UPDATE } = require('sequelize/lib/query-types');
+
 const db = require('../config/database');
 const { convertToCamelCase } = require('../utils/convertToCamelCase');
+
+
+
+// Função auxiliar para formatar datas
+const formatData = (date) => new Date(date).toISOString().split('T')[0];
 
 
 const Employee = {
@@ -12,13 +17,14 @@ const Employee = {
   // Criar um novo funcionário
   create: async ({ name, birth_date, email, phone }) => {
     // Extrai apenas a parte da data no formato YYYY-MM-DD
-    const formattedDate = new Date(birth_date).toISOString().split('T')[0];
+    const formattedDate = formatData(birth_date);
     const snakeCaseData = {
       name,
-      birth_date: formattedDate, // ✅ Corrigido para usar a data formatada
+      birth_date: formattedDate,
       email,
       phone
     };
+
     const [result] = await db.query(
       'INSERT INTO employees (name, birth_date, email, phone) VALUES (?, ?, ?, ?)',
       [name, formattedDate, email, phone]
@@ -29,8 +35,13 @@ const Employee = {
 
    // Deletar um funcionário
   delete: async (id) => {
+    const [employee] = await db.query('SELECT * FROM employees WHERE id = ?', [id]);
+    if (employee.length === 0) {
+      return null; // Retorna null se não encontrar o funcionário
+    }
+
     await db.query('DELETE FROM employees WHERE id = ?', [id]);
-    return true;
+    return convertToCamelCase(employee)[0]; // Retorna os dados do funcionário deletado
   },
 
     /// Buscar funcionário por ID com conversão para camelCase
@@ -42,7 +53,7 @@ const Employee = {
 
     // Atualiza um funcionário
     update: async (id, { name, birth_date, email, phone}) => {
-      const formattedDate = new Date(birth_date).toISOString().split('T')[0];
+      const formattedDate = formatData(birth_date);
       const snakeCaseData = {
         name,
         birth_date: formattedDate,

@@ -22,17 +22,14 @@ app.get('/', (req, res) => {
 
 
 const vacationRoutes = require('./routes/vacationRoutes');
-
 app.use('/api/vacations', vacationRoutes);
 
 const dayoffRoutes = require('./routes/dayoffRoutes');
-
 app.use('/api/dayoffs', dayoffRoutes);
 
 
 
 const shiftRoutes = require('./routes/shiftRoutes');
-
 app.use('/api/shifts', shiftRoutes);
 
 module.exports = app;

@@ -3,6 +3,10 @@ const { convertToCamelCase } = require('../utils/convertToCamelCase');
 
 
 
+// Função auxiliar para formatar datas
+const formatData = (date) => new Date(date).toISOString().split('T')[0];
+
+
 const Vacation = {
   getAll: async () => {
     const [rows] = await db.query('SELECT * FROM vacations');

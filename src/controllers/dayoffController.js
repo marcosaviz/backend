@@ -26,7 +26,7 @@ exports.getAll = async (req, res) => {
 };
 
 exports.create = async (req, res) => {
-  console.log(req.body);  // Adicione isso para verificar os dados recebidos
+  //console.log(req.body);  // Adicione isso para verificar os dados recebidos
   const { error } = dayOffSchema.validate(req.body);
   if (error) return res.status(400).json({ error: error.details[0].message });
 

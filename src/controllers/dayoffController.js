@@ -1,5 +1,6 @@
 const DayOff = require('../models/dayoffModel');
 const Employee = require('../models/employeeModel'); // você precisa ter esse model
+const { convertToCamelCase } = require('../utils/convertToCamelCase');
 const Joi = require('joi');
 
 
@@ -8,7 +9,7 @@ const Joi = require('joi');
 const dayOffSchema = Joi.object({
   employee_id: Joi.number().integer().required(),
   day: Joi.date().iso().required().messages({
-    'data.base': 'day" deve ser uma data válida no formato ISO 8601'
+    'data.base': 'O campo "day" deve ser uma data válida no formato ISO 8601'
   }),
   reason: Joi.string().max(255).required()
 });
@@ -52,3 +53,18 @@ exports.create = async (req, res) => {
     res.status(500).json({ error: 'Erro interno no servidor' });
   }
 };
+
+exports.delete = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const result = await DayOff.delete(id);
+    if (!result) {
+      return res.status(400).json({error: 'Folga não encontrada' });
+    }
+    res.status(204).send();
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Erro ao excluir folga'});
+  }
+}
+  

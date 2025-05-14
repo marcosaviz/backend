@@ -1,5 +1,6 @@
 const db = require('../config/database');
 const { convertToCamelCase } = require('../utils/convertToCamelCase');
+const { getByEmployee } = require('./vacationModel');
 
 
 // Função auxiliar para formatar datas
@@ -7,12 +8,13 @@ const formatData = (date) => new Date(date).toISOString().split('T')[0];
 
 
 const DayOff = {
+
   getAll: async () => {
     const [rows] = await db.query('SELECT * FROM dayoffs');
     return convertToCamelCase(rows);
   },
 
-
+  
   create: async ({ employee_id, day, reason }) => {
     // Convertendo a data para o formato aceito pelo MySQL
     const formattedDate = formatData(day);

@@ -8,6 +8,7 @@ const formatData = (date) => new Date(date).toISOString().split('T')[0];
 
 
 const Vacation = {
+  
   getAll: async () => {
     const [rows] = await db.query('SELECT * FROM vacations');
     return convertToCamelCase(rows); // Aplica a conversão para camelCase

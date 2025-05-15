@@ -1,4 +1,5 @@
-// Função para converter de snake_case para camelCase
+// Converte strings do formato snake_case para camelCase
+// snakeToCamel('employee_id'); // Resultado: 'employeeId'
 const snakeToCamel = (str) => {
     return str.replace(/(_\w)/g, (matches) => matches[1].toUpperCase());
   };

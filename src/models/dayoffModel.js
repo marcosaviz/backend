@@ -16,6 +16,10 @@ const DayOff = {
 
   
   create: async ({ employee_id, day, reason }) => {
+    if (!employee_id || !day || !reason) {
+      throw new Error('Todos os campos são obrigatórios');
+    }
+
     // Convertendo a data para o formato aceito pelo MySQL
     const formattedDate = formatData(day);
     const [result] = await db.query(
@@ -27,7 +31,7 @@ const DayOff = {
 
   delete: async (id) => {
     const [dayoff] = await db.query('SELECT * FROM dayoffs WHERE id = ?', [id]);
-    if (dayoff.length === 0) {
+    if (!dayoff || dayoff.length === 0) {
       return null; // Retorna null se não encontrar o funcionário
     }
 
@@ -37,9 +41,10 @@ const DayOff = {
 
   // Método para encontrar um dayoff existente por employee_id e day
   findByEmployeeAndDay: async (employee_id, day) => {
+    const formattedDate = formatData(day);
     const [rows] = await db.query(
       'SELECT * FROM dayoffs WHERE employee_id = ? AND day = ?',
-      [employee_id, day]
+      [employee_id, formattedDate]
     );
     return convertToCamelCase(rows)[0]; // Retorna o primeiro registro encontrado, ou undefined se não houver.
   }

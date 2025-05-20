@@ -2,9 +2,9 @@ const mysql = require('mysql2/promise');
 
 async function setupDatabase() {
     const connection = await mysql.createConnection({
-        host: '172.22.112.1',  // localhost
-        user: 'marcos',        //maviz
-        password: 'marcos20'   // J@P0nes1995
+        host: '127.0.0.1',  //  ou localhost
+        user: 'marcos',
+        password: 'marcos20'
     });
 
     try {
@@ -15,16 +15,18 @@ async function setupDatabase() {
 
         await connection.query(`USE escala12x36;`);
 
-        // Criação da tabela employees
+        // Criação da tabela employees com email e phone
         await connection.query(`
             CREATE TABLE IF NOT EXISTS employees (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 name VARCHAR(255) NOT NULL,
                 birth_date DATE NOT NULL,
+                email VARCHAR(255),
+                phone VARCHAR(20),
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         `);
-        console.log('Tabela employees criada/verificada.');
+        console.log('Tabela employees criada/verificada com email e phone.');
 
         // Drop + recriação das tabelas relacionadas com ON DELETE CASCADE
         await connection.query(`DROP TABLE IF EXISTS vacations;`);
@@ -82,37 +84,3 @@ async function setupDatabase() {
 }
 
 setupDatabase();
-
-/* 
-Adicionar ON DELETE CASCADE nas Foreign Keys
-Uma solução possível é garantir que, quando um registro em employees for excluído, os registros nas tabelas dependentes (vacations, dayoffs, shifts) sejam automaticamente removidos também. 
-Você pode modificar a definição das chaves estrangeiras nas tabelas relacionadas para incluir a cláusula ON DELETE CASCADE, 
-que irá excluir os registros dependentes automaticamente quando o funcionário for deletado.
-
-Aqui está o código para modificar as tabelas para usar o ON DELETE CASCADE:
-
-CREATE TABLE IF NOT EXISTS vacations (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    employee_id INT,
-    start_date DATE,
-    end_date DATE,
-    FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS dayoffs (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    employee_id INT,
-    day DATE,
-    reason VARCHAR(255),
-    FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS shifts (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    employee_id INT,
-    shift_date DATE,
-    shift_type ENUM('NIGHT', 'DAY'),
-    FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE
-);
-
-*/

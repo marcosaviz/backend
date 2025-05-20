@@ -2,7 +2,7 @@ const mysql = require('mysql2/promise');
 
 // Configuração do banco
 const connection = mysql.createPool({
-    host: '172.22.112.1',   // ou o IP do seu banco
+    host: '127.0.0.1',   // ou o IP do seu banco
     user: 'marcos',
     password: 'marcos20',
     database: 'escala12x36',

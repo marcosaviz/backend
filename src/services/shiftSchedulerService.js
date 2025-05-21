@@ -31,72 +31,81 @@ async function isUnavailable(employee_id, date) {
   return rows.length > 0;
 }
 
-// Deleta a escala gerada
-async function deleteShifts() {
-  await db.query('DELETE FROM shifts');
-  return { message: 'Escala apagada com sucesso!' };
-}
 
 // Geração de escala
 async function generateShifts(startDate, endDate) {
   const [employees] = await db.query('SELECT id FROM employees');
   let shiftPlan = [];
-
+  
   const start = new Date(startDate);
   const end = new Date(endDate);
-
+  
   for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-    const day = new Date(d); // Cópia da data para evitar mutações
-
+    const day = new Date(d); // evita mutação de data
+    
     const isHolidayFlag = await isHoliday(day);
     const isWeekendFlag = isWeekend(day);
+    
+    // Determine quais turnos devem ser gerados
+    const shiftsToGenerate = [];
 
-    const shiftType = (isHolidayFlag || isWeekendFlag) ? 'DAY' : 'NIGHT';
-    let assignedNight = 0;
-
-    // Verificar se já existe escala para o dia/turno
-    const [existingShifts] = await db.query(`
-      SELECT * FROM shifts WHERE shift_date = ? AND shift_type = ?
-    `, [day.toISOString().split('T')[0], shiftType]);
-
-    if ((shiftType === 'DAY' && existingShifts.length >= 1) ||
-        (shiftType === 'NIGHT' && existingShifts.length >= 2)) {
-      continue;
+    if (isHolidayFlag || isWeekendFlag) {
+      shiftsToGenerate.push({ type: 'DAY', max: 1 });
+      shiftsToGenerate.push({ type: 'NIGHT', max: 1 });
+    } else {
+      shiftsToGenerate.push({ type: 'NIGHT', max: 2 });
     }
 
-    for (const employee of employees) {
-      const unavailable = await isUnavailable(employee.id, day);
-      if (unavailable) continue;
+    for (const shift of shiftsToGenerate) {
+      const [existingShifts] = await db.query(`
+        SELECT * FROM shifts WHERE shift_date = ? AND shift_type = ?
+      `, [day.toISOString().split('T')[0], shift.type]);
 
-      // Alternância 12x36
-      const [lastShift] = await db.query(`
-        SELECT shift_date FROM shifts
-        WHERE employee_id = ? ORDER BY shift_date DESC LIMIT 1
-      `, [employee.id]);
+      if (existingShifts.length >= shift.max) continue;
 
-      if (lastShift.length > 0) {
-        const lastDate = new Date(lastShift[0].shift_date);
-        const diffDays = (day - lastDate) / (1000 * 3600 * 24);
-        if (diffDays < 2) continue;
+      let assigned = existingShifts.length;
+
+      for (const employee of employees) {
+        if (assigned >= shift.max) break;
+
+        const unavailable = await isUnavailable(employee.id, day);
+        if (unavailable) continue;
+
+        const [lastShift] = await db.query(`
+          SELECT shift_date FROM shifts
+          WHERE employee_id = ? ORDER BY shift_date DESC LIMIT 1
+        `, [employee.id]);
+
+        if (lastShift.length > 0) {
+          const lastDate = new Date(lastShift[0].shift_date);
+          const diffDays = (day - lastDate) / (1000 * 3600 * 24);
+          if (diffDays < 2) continue;
+        }
+
+        await db.query(`
+          INSERT INTO shifts (employee_id, shift_date, shift_type) VALUES (?, ?, ?)
+        `, [employee.id, day.toISOString().split('T')[0], shift.type]);
+
+        shiftPlan.push({
+          employee_id: employee.id,
+          date: new Date(day),
+          shiftType: shift.type
+        });
+
+        assigned++;
       }
-
-      // Agendar turno
-      await db.query(`
-        INSERT INTO shifts (employee_id, shift_date, shift_type) VALUES (?, ?, ?)
-      `, [employee.id, day.toISOString().split('T')[0], shiftType]);
-
-      shiftPlan.push({
-        employee_id: employee.id,
-        date: new Date(day),
-        shiftType
-      });
-
-      if (shiftType === 'NIGHT') assignedNight++;
-      break; // Apenas um funcionário por turno do dia, máximo dois à noite
     }
   }
 
   return shiftPlan;
+}
+
+
+
+// Deleta a escala gerada
+async function deleteShifts() {
+  await db.query('DELETE FROM shifts');
+  return { message: 'Escala apagada com sucesso!' };
 }
 
 module.exports = {

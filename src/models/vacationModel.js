@@ -35,6 +35,16 @@ const Vacation = {
       [snakeCaseData.employee_id, snakeCaseData.start_date, snakeCaseData.end_date]
     );
     return { id: result.insertId, ... snakeCaseData };
+  },
+
+  delete: async (id) => {
+    const [vacation] = await db.query('SELECT * FROM vacations WHERE id = ?', [id]);
+    if (!vacation || vacation.length === 0) {
+      return null;
+    }
+
+    await db.query('DELETE FROM vacations WHERE id = ?', [id]);
+    return convertToCamelCase(vacation)[0]; // Retorna os dados do funcionário deletado
   }
 };
 
